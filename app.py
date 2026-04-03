@@ -157,4 +157,11 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor">Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
             
             # Bloque Xtras (Ahora en azul)
-            st.markdown
+            st.markdown(f"""
+                <div class="w-xtras-container">
+                    <div class="w-xtras-title">Notas Adicionales (Xtras)</div>
+                    <div class="w-xtras-text">{res['xtras']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.info("Seleccione los parámetros para mostrar los resultados.")
