@@ -10,14 +10,26 @@ st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
+    /* TÍTULO MÁS GRANDE Y CENTRADO */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 26px;
+        font-size: 34px; /* Tamaño aumentado */
         font-weight: bold;
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 0px;
     }
+    
+    /* FIRMA CENTRADA DEBAJO DEL TÍTULO */
+    .author-signature {
+        font-family: sans-serif;
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-style: italic;
+    }
+
     .w-label { 
         font-family: sans-serif; 
         font-size: 14px; 
@@ -26,6 +38,7 @@ st.markdown("""
         margin-bottom: 5px;
         display: block;
     }
+
     .caudal-container {
         display: flex;
         justify-content: center;
@@ -39,7 +52,6 @@ st.markdown("""
         padding: 5px 20px; border-radius: 10px; border: 2px solid #4CAF50;
     }
     
-    /* BLOQUE UNIFICADO DE FACTOR */
     .factor-block {
         display: flex;
         flex-direction: column;
@@ -48,7 +60,6 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Etiqueta superior */
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
@@ -57,7 +68,6 @@ st.markdown("""
         box-sizing: border-box;
     }
 
-    /* Imagen central */
     .stImage > img {
         border-radius: 0;
         border-left: 1px solid #2196F3;
@@ -67,7 +77,6 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Valor inferior */
     .w-factor-footer {
         background-color: #F5F5F5; color: #1565C0;
         font-size: 22px; font-weight: bold; text-align: center;
@@ -81,8 +90,6 @@ st.markdown("""
         background-color: #F1F8E9; margin-top: 20px;
         max-width: 450px; margin-left: auto; margin-right: auto;
     }
-    .w-xtras-title { color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px; }
-    .w-xtras-text { font-size: 12px; text-align: center; color: #333; }
 
     div.stButton > button[kind="primary"] {
         background-color: #1E88E5 !important;
@@ -105,10 +112,12 @@ def cargar_datos():
 df = cargar_datos()
 if df is None: st.stop()
 
-st.sidebar.write("🛠️ **Soporte SAT**")
-st.sidebar.caption("By **C@renasM**")
-
+# CABECERA: TÍTULO Y FIRMA
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
+st.markdown('<p class="author-signature">By C@renasM</p>', unsafe_allow_html=True)
+
+# Sidebar (Limpio)
+st.sidebar.write("🛠️ **Soporte SAT**")
 
 # --- BOTONES DE SERIE ---
 series = sorted(df['serie'].unique())
@@ -144,10 +153,8 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f[df_f['año'] == sel_ano].iloc[0]
             
-            # Bloque Caudal
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
-            # --- BLOQUES DE FACTORES REESTRUCTURADOS ---
             f_cols = st.columns(2)
             
             with f_cols[0]:
@@ -164,7 +171,6 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            # Bloque Notas
-            st.markdown(f'<div class="w-xtras-container"><div class="w-xtras-title">Notas Adicionales (Xtras)</div><div class="w-xtras-text">{res["xtras"]}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 12px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
         else:
             st.info("Seleccione los parámetros para mostrar los resultados.")
