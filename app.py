@@ -10,7 +10,6 @@ st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* Título Principal */
     .main-title {
         font-family: sans-serif;
         color: #0D47A1;
@@ -19,7 +18,6 @@ st.markdown("""
         text-align: center;
         margin-bottom: 5px;
     }
-    
     .w-label { 
         font-family: sans-serif; 
         font-size: 16px; 
@@ -28,33 +26,31 @@ st.markdown("""
         margin-bottom: 5px;
         display: block;
     }
-    .stSelectbox { margin-bottom: 15px; }
-    
     .caudal-container {
         height: 60px;
         display: flex;
         align-items: center;
+        margin-bottom: 10px;
     }
-    
     .w-caudal {
         background-color: #90EE90; color: #1b5e20;
         font-size: 22px; font-weight: bold; text-align: center;
         padding: 5px 15px; border-radius: 8px; border: 2px solid #2e7d32;
         display: inline-block;
     }
-    
-    .w-factor-row {
-        margin-top: 25px; 
-    }
-    
     .w-factor {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
         padding: 8px; border-radius: 8px; border: 1px solid #2196F3;
-        min-height: 85px;
+        margin-top: 10px;
     }
     .w-factor-val { font-size: 20px; display: block; margin-top: 2px; }
     
+    .stImage > img {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
     .w-xtras-container {
         border: 1px solid #333; padding: 10px; border-radius: 5px;
         background-color: #fff; margin-top: 20px;
@@ -87,12 +83,10 @@ def cargar_datos():
 df = cargar_datos()
 if df is None: st.stop()
 
-# Firma en la barra lateral
 st.sidebar.markdown("---")
 st.sidebar.write("🛠️ **Soporte Técnico SAT**")
 st.sidebar.markdown("By **C@renasM**")
 
-# --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.write("Seleccione parámetros para acceder a la información")
 
@@ -111,7 +105,6 @@ for i, s in enumerate(series_disponibles):
 # --- 2. FLUJO DE SELECCIÓN ---
 if st.session_state.serie_sel:
     col_izq, col_der = st.columns([1, 2])
-
     with col_izq:
         df_f = df[df['serie'] == st.session_state.serie_sel]
         st.markdown('<p class="w-label">Dimensión (mm)</p>', unsafe_allow_html=True)
@@ -136,7 +129,7 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f.iloc[0]
             
-            # --- FILA DE CABECERA (Caudal) ---
+            # --- CAUDAL SUPERIOR ---
             st.markdown(f"""
                 <div class="caudal-container">
                     <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
@@ -144,20 +137,24 @@ if st.session_state.serie_sel:
                 </div>
             """, unsafe_allow_html=True)
 
-            # --- FILA DE FACTORES ---
-            st.markdown('<div class="w-factor-row">', unsafe_allow_html=True)
+            # --- FOTOS Y FACTORES ---
             f_cols = st.columns(2)
-            with f_cols[0]:
-                st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/guia_bypass.jpg"): st.image("fotos/guia_bypass.jpg")
-                else: st.caption("📸 Foto Bypass")
-                    
-            with f_cols[1]:
-                st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/guia_lower.jpg"): st.image("fotos/guia_lower.jpg")
-                else: st.caption("📸 Foto Lower")
-            st.markdown('</div>', unsafe_allow_html=True)
             
+            with f_cols[0]: # COLUMNA BYPASS
+                if os.path.exists("fotos/bypass.jpg"):
+                    st.image("fotos/bypass.jpg", use_container_width=True)
+                else:
+                    st.warning("⚠️ No se encuentra 'fotos/bypass.jpg'")
+                st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
+                    
+            with f_cols[1]: # COLUMNA LOWER
+                if os.path.exists("fotos/lower.jpg"):
+                    st.image("fotos/lower.jpg", use_container_width=True)
+                else:
+                    st.warning("⚠️ No se encuentra 'fotos/lower.jpg'")
+                st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
+            
+            # --- XTRAS ---
             st.markdown(f"""
                 <div class="w-xtras-container">
                     <div class="w-xtras-title">Xtras</div>
