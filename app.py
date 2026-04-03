@@ -5,12 +5,16 @@ import os
 # --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
-st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
+# Configuración de página sin barra lateral por defecto
+st.set_page_config(page_title="Caudales & Factor Check", layout="wide", initial_sidebar_state="collapsed")
 
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* TÍTULO PRINCIPAL */
+    /* Ocultar botón de sidebar y espacios innecesarios */
+    [data-testid="stSidebar"] {display: none;}
+    [data-testid="stSidebarNav"] {display: none;}
+    
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
@@ -20,13 +24,12 @@ st.markdown("""
         margin-bottom: 2px;
     }
     
-    /* SOPORTE Y FIRMA EN LA MISMA LÍNEA */
     .header-info {
         font-family: sans-serif;
         color: #666;
         font-size: 14px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .w-label { 
@@ -109,14 +112,13 @@ def cargar_datos():
     except: return None
 
 df = cargar_datos()
-if df is None: st.stop()
+if df is None:
+    st.error("Archivo de datos no encontrado.")
+    st.stop()
 
-# CABECERA UNIFICADA
+# CABECERA (Sin Sidebar)
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
-
-# Sidebar (Ahora más despejado)
-st.sidebar.caption("Panel de Control SAT")
 
 # --- BOTONES DE SERIE ---
 series = sorted(df['serie'].unique())
@@ -172,4 +174,6 @@ if st.session_state.serie_sel:
             
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 12px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
         else:
-            st.info("Seleccione los parámetros para mostrar los resultados.")
+            st.info("Seleccione los parámetros para acceder a la información.")
+else:
+    st.info("Seleccione una Serie para comenzar.")
