@@ -14,37 +14,38 @@ st.set_page_config(
 # --- ESTILOS CSS PERSONALIZADOS ---
 st.markdown("""
     <style>
-    /* 1. ELIMINAR SIDEBAR Y AJUSTAR MARGEN SUPERIOR */
+    /* ELIMINAR SIDEBAR Y AJUSTAR ESPACIO SUPERIOR */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
         display: none;
     }
     
     .block-container {
-        padding-top: 3.5rem !important; 
+        padding-top: 4rem !important; 
     }
 
-    /* 2. TÍTULOS: Título grande y Firma pequeña */
+    /* TÍTULO AZUL: GRANDE Y NEGRITA */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 52px; /* Tamaño máximo para el título */
+        font-size: 55px; /* Tamaño aumentado */
         font-weight: 900;
         text-align: center;
         margin-bottom: 0px;
         line-height: 1.1;
     }
     
+    /* FIRMA: PEQUEÑA Y DISCRETA */
     .header-info {
         font-family: sans-serif;
-        color: #555;
-        font-size: 16px; /* Tamaño reducido para la firma */
+        color: #666;
+        font-size: 15px; /* Tamaño disminuido */
         text-align: center;
         margin-bottom: 40px;
         font-style: italic;
-        opacity: 0.8;
+        opacity: 0.7;
     }
 
-    /* 3. ELEMENTOS DE LA INTERFAZ */
+    /* ESTILOS DE COMPONENTES */
     .w-label { 
         font-family: sans-serif; 
         font-size: 14px; 
@@ -124,14 +125,14 @@ def cargar_datos():
 
 df = cargar_datos()
 if df is None:
-    st.error("Error: No se encontró el archivo 'datos_caudales.xlsx'")
+    st.error("Archivo Excel no encontrado.")
     st.stop()
 
 # --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
 
-# --- BOTONES DE SERIE (HORIZONTAL) ---
+# --- SELECTOR DE SERIE ---
 series = sorted(df['serie'].unique())
 if "serie_sel" not in st.session_state: st.session_state.serie_sel = None
 
@@ -142,7 +143,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- CUERPO DE LA APP ---
+# --- ÁREA DE TRABAJO ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -165,10 +166,10 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f[df_f['año'] == sel_ano].iloc[0]
             
-            # Caudal Consigna
+            # Caudal
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
-            # Bloques de Factores
+            # Factores
             f_cols = st.columns(2)
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
@@ -184,9 +185,7 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            # Notas Xtras
+            # Xtras
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
-        else:
-            st.info("Utilice los menús de la izquierda para filtrar la información técnica.")
 else:
-    st.info("Seleccione una Serie en la barra superior para comenzar.")
+    st.info("Seleccione una Serie arriba para visualizar los datos.")
