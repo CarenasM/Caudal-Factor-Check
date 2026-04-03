@@ -20,9 +20,8 @@ st.markdown("""
     }
     .stSelectbox { margin-bottom: 15px; }
     
-    /* Contenedor para el caudal para que no empuje el factor hacia abajo */
     .caudal-container {
-        height: 50px;
+        height: 60px; /* Aumentado ligeramente */
         display: flex;
         align-items: center;
     }
@@ -34,17 +33,22 @@ st.markdown("""
         display: inline-block;
     }
     
+    /* Añadido margen superior para separar de la fila del caudal */
+    .w-factor-row {
+        margin-top: 25px; 
+    }
+    
     .w-factor {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
         padding: 8px; border-radius: 8px; border: 1px solid #2196F3;
-        min-height: 80px; /* Altura fija para asegurar alineación */
+        min-height: 85px;
     }
     .w-factor-val { font-size: 20px; display: block; margin-top: 2px; }
     
     .w-xtras-container {
         border: 1px solid #333; padding: 10px; border-radius: 5px;
-        background-color: #fff; margin-top: 10px;
+        background-color: #fff; margin-top: 20px;
     }
     .w-xtras-title { color: red; font-style: italic; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 2px; }
     .w-xtras-text { font-size: 13px; text-align: center; color: #333; }
@@ -121,20 +125,16 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f.iloc[0]
             
-            # --- FILA DE CABECERA (Caudal a la izquierda) ---
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown(f"""
-                    <div class="caudal-container">
-                        <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
-                        <div class="w-caudal">{res['consigna']}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-            with c2:
-                # Espacio para mantener la simetría
-                st.markdown('<div class="caudal-container"></div>', unsafe_allow_html=True)
+            # --- FILA DE CABECERA (Caudal) ---
+            st.markdown(f"""
+                <div class="caudal-container">
+                    <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
+                    <div class="w-caudal">{res['consigna']}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-            # --- FILA DE FACTORES (Alineados) ---
+            # --- FILA DE FACTORES (Bajados con margen superior) ---
+            st.markdown('<div class="w-factor-row">', unsafe_allow_html=True)
             f_cols = st.columns(2)
             with f_cols[0]:
                 st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
@@ -145,6 +145,7 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
                 if os.path.exists("fotos/guia_lower.jpg"): st.image("fotos/guia_lower.jpg")
                 else: st.caption("📸 Foto Lower")
+            st.markdown('</div>', unsafe_allow_html=True)
             
             st.markdown(f"""
                 <div class="w-xtras-container">
