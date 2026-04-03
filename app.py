@@ -7,66 +7,69 @@ EXCEL_FILE = "datos_caudales.xlsx"
 
 st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
 
-# --- ESTILOS CSS ---
+# --- ESTILOS CSS SUPER COMPACTOS ---
 st.markdown("""
     <style>
     .main-title {
         font-family: sans-serif;
         color: #0D47A1;
-        font-size: 28px;
+        font-size: 22px;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
     }
     .w-label { 
         font-family: sans-serif; 
-        font-size: 15px; 
+        font-size: 14px; 
         font-style: italic; 
         font-weight: bold;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
         display: block;
     }
     .caudal-container {
-        height: 50px;
+        height: 40px;
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
     .w-caudal {
         background-color: #90EE90; color: #1b5e20;
-        font-size: 20px; font-weight: bold; text-align: center;
-        padding: 5px 12px; border-radius: 8px; border: 2px solid #2e7d32;
+        font-size: 18px; font-weight: bold; text-align: center;
+        padding: 2px 10px; border-radius: 6px; border: 2px solid #2e7d32;
         display: inline-block;
     }
     
-    /* Cuadros de Factores REDUCIDOS para que quepan bajo las fotos */
-    .w-factor {
-        background-color: #E3F2FD; color: #0D47A1;
-        font-size: 12px; font-weight: bold; text-align: center;
-        padding: 5px; border-radius: 8px; border: 1px solid #2196F3;
-        margin-top: 5px;
-        width: 100%;
-    }
-    .w-factor-val { font-size: 16px; display: block; margin-top: 2px; }
-    
+    /* IMÁGENES REDUCIDAS */
     .stImage > img {
-        border-radius: 10px;
+        border-radius: 8px;
         border: 1px solid #ddd;
+        max-width: 180px !important; /* Forzamos tamaño pequeño */
+        margin: 0 auto;
+        display: block;
     }
 
-    .w-xtras-container {
-        border: 1px solid #333; padding: 10px; border-radius: 5px;
-        background-color: #fff; margin-top: 15px;
+    /* Cuadros de Factores AJUSTADOS */
+    .w-factor {
+        background-color: #E3F2FD; color: #0D47A1;
+        font-size: 11px; font-weight: bold; text-align: center;
+        padding: 4px; border-radius: 6px; border: 1px solid #2196F3;
+        margin-top: 5px;
+        max-width: 180px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    .w-xtras-title { color: red; font-style: italic; font-weight: bold; font-size: 13px; text-align: center; margin-bottom: 2px; }
-    .w-xtras-text { font-size: 12px; text-align: center; color: #333; }
+    .w-factor-val { font-size: 15px; display: block; margin-top: 1px; }
     
-    div.stButton > button[kind="primary"] {
-        background-color: #00BFFF !important; 
-        color: white !important;
-        border: 1px solid #00BFFF !important;
+    .w-xtras-container {
+        border: 1px solid #333; padding: 8px; border-radius: 5px;
+        background-color: #fff; margin-top: 10px;
+        max-width: 370px; /* Alineado con el ancho de las dos fotos */
     }
-    div.stButton > button { font-size: 13px !important; padding: 2px !important; }
+    .w-xtras-title { color: red; font-style: italic; font-weight: bold; font-size: 12px; text-align: center; }
+    .w-xtras-text { font-size: 11px; text-align: center; color: #333; }
+    
+    /* Botones más pequeños */
+    div.stButton > button { font-size: 12px !important; padding: 1px !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -86,12 +89,9 @@ def cargar_datos():
 df = cargar_datos()
 if df is None: st.stop()
 
-st.sidebar.markdown("---")
-st.sidebar.write("🛠️ **Soporte Técnico SAT**")
-st.sidebar.markdown("By **C@renasM**")
+st.sidebar.write("🛠️ **SAT** | By **C@renasM**")
 
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
-st.write("Seleccione parámetros")
 
 # --- 1. BOTONES DE SERIE ---
 series_disponibles = sorted(df['serie'].unique())
@@ -109,7 +109,7 @@ if st.session_state.serie_sel:
     col_izq, col_der = st.columns([1, 2])
     with col_izq:
         df_f = df[df['serie'] == st.session_state.serie_sel]
-        st.markdown('<p class="w-label">Dimensión (mm)</p>', unsafe_allow_html=True)
+        st.markdown('<p class="w-label">Dimensión</p>', unsafe_allow_html=True)
         dim_opts = ["- Seleccionar -"] + sorted(df_f['dimension'].unique().tolist(), key=lambda x: int(x) if str(x).isdigit() else 0)
         sel_dim = st.selectbox("dim", dim_opts, label_visibility="collapsed")
         
@@ -131,36 +131,29 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f.iloc[0]
             
-            # --- CAUDAL SUPERIOR ---
             st.markdown(f"""
                 <div class="caudal-container">
-                    <span style="margin-right: 10px; font-weight: bold; font-size: 13px;">Caudal Consigna</span>
+                    <span style="margin-right: 8px; font-weight: bold; font-size: 12px;">Caudal Consigna</span>
                     <div class="w-caudal">{res['consigna']}</div>
                 </div>
             """, unsafe_allow_html=True)
 
-            # --- FOTOS Y FACTORES ALINEADOS ---
-            # Usamos 4 columnas para que las fotos queden centradas y los textos justo debajo
-            f_cols = st.columns([1, 1, 0.5, 0.5])
+            # --- FOTOS Y FACTORES MINI ---
+            f_cols = st.columns([1, 1, 1]) # Usamos una tercera columna vacía para empujar a la izquierda
             
-            with f_cols[0]: # COLUMNA BYPASS
+            with f_cols[0]:
                 if os.path.exists("fotos/bypass.jpg"):
-                    st.image("fotos/bypass.jpg", use_container_width=True)
+                    st.image("fotos/bypass.jpg")
                 st.markdown(f'<div class="w-factor">Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
                     
-            with f_cols[1]: # COLUMNA LOWER
+            with f_cols[1]:
                 if os.path.exists("fotos/lower.jpg"):
-                    st.image("fotos/lower.jpg", use_container_width=True)
+                    st.image("fotos/lower.jpg")
                 st.markdown(f'<div class="w-factor">Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
             
-            # --- XTRAS ---
             st.markdown(f"""
                 <div class="w-xtras-container">
                     <div class="w-xtras-title">Xtras</div>
                     <div class="w-xtras-text">{res['xtras']}</div>
                 </div>
             """, unsafe_allow_html=True)
-        else:
-            if st.session_state.serie_sel: st.info("Complete la selección.")
-else:
-    st.info("Seleccione una Serie.")
