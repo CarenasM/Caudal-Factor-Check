@@ -11,48 +11,77 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS CORREGIDOS ---
+# --- ESTILOS CSS REVISADOS ---
 st.markdown("""
     <style>
+    /* Ocultar Sidebar */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] { display: none; }
     
     .block-container { padding-top: 3rem !important; }
 
-    /* TÍTULO: Grande y Legible */
+    /* TÍTULO Y FIRMA (REDUCIDA A LA MITAD) */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
         font-size: 60px; 
         font-weight: 900;
         text-align: center;
-        margin-bottom: 10px;
-        line-height: 1.2;
+        margin-bottom: 5px;
     }
     
-    /* FIRMA: Pequeña y centrada */
     .header-info {
         font-family: sans-serif;
         color: #666;
-        font-size: 12px; 
+        font-size: 8px; /* Tamaño reducido a la mitad */
         text-align: center;
         margin-bottom: 40px;
         letter-spacing: 1px;
+        text-transform: uppercase;
     }
 
+    /* ALINEACIÓN DE CUADROS Y TEXTOS */
+    .factor-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%; /* Asegura que ocupe el ancho de la columna */
+        max-width: 350px; /* Ajuste para que coincida con el ancho de las imágenes */
+        margin: 0 auto;
+    }
+
+    .w-factor-header {
+        background-color: #E3F2FD; color: #0D47A1;
+        font-size: 15px; font-weight: bold; text-align: center;
+        padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .stImage > img {
+        border-left: 1px solid #2196F3;
+        border-right: 1px solid #2196F3;
+        width: 100% !important; /* Imagen ocupa todo el bloque */
+        display: block;
+    }
+
+    .w-factor-footer {
+        background-color: #F5F5F5; color: #1565C0;
+        font-size: 26px; font-weight: bold; text-align: center;
+        padding: 15px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* OTROS ESTILOS */
     .w-label { font-family: sans-serif; font-size: 14px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
     .caudal-container { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 15px; }
-    .w-caudal { background-color: #E8F5E9; color: #2E7D32; font-size: 24px; font-weight: bold; text-align: center; padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50; }
-    .factor-block { display: flex; flex-direction: column; align-items: center; max-width: 200px; margin: 0 auto; }
-    .w-factor-header { background-color: #E3F2FD; color: #0D47A1; font-size: 15px; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3; width: 100%; box-sizing: border-box; }
-    .stImage > img { border-left: 1px solid #2196F3; border-right: 1px solid #2196F3; max-width: 200px !important; display: block; }
-    .w-factor-footer { background-color: #F5F5F5; color: #1565C0; font-size: 26px; font-weight: bold; text-align: center; padding: 10px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3; width: 100%; box-sizing: border-box; }
-    .w-xtras-container { border: 1px solid #2196F3; padding: 20px; border-radius: 12px; background-color: #F1F8E9; margin-top: 35px; max-width: 550px; margin-left: auto; margin-right: auto; }
+    .w-caudal { background-color: #E8F5E9; color: #2E7D32; font-size: 24px; font-weight: bold; padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50; }
+    .w-xtras-container { border: 1px solid #2196F3; padding: 20px; border-radius: 12px; background-color: #F1F8E9; margin-top: 35px; max-width: 600px; margin-left: auto; margin-right: auto; }
     div.stButton > button[kind="primary"] { background-color: #1E88E5 !important; color: white !important; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- LÓGICA DE CARGA ---
-@st.cache_data
+# --- CARGA DE DATOS ---
 def cargar_datos():
     if not os.path.exists(EXCEL_FILE): return None
     try:
@@ -63,16 +92,15 @@ def cargar_datos():
     except: return None
 
 df = cargar_datos()
-
 if df is None:
-    st.error("Error: No se encontró 'datos_caudales.xlsx'")
+    st.error("Archivo Excel no encontrado.")
     st.stop()
 
 # --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.markdown('<p class="header-info">SOPORTE TÉCNICO SAT | BY C@RENASM</p>', unsafe_allow_html=True)
 
-# --- BOTONES DE SERIE ---
+# --- SELECTOR DE SERIE ---
 series = sorted(df['serie'].unique())
 if "serie_sel" not in st.session_state: st.session_state.serie_sel = None
 
@@ -83,7 +111,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- CONTENIDO ---
+# --- ÁREA DE RESULTADOS ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -109,26 +137,28 @@ if st.session_state.serie_sel:
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
             f_cols = st.columns(2)
+            
+            # Bloque Bypass
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Bypass</div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/bypass.jpg"): st.image("fotos/bypass.jpg")
+                if os.path.exists("fotos/bypass.jpg"): st.image("fotos/bypass.jpg", use_container_width=True)
                 st.markdown(f'<div class="w-factor-footer">{res["factor-bypass"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
                     
+            # Bloque Lower
             with f_cols[1]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Lower</div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/lower.jpg"): st.image("fotos/lower.jpg")
+                if os.path.exists("fotos/lower.jpg"): st.image("fotos/lower.jpg", use_container_width=True)
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
+            # Notas Xtras
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
-else:
-    st.info("Seleccione una Serie para comenzar.")
 
-# RECARGA AL FINAL
+# Botón de actualización al final
 st.write("---")
-if st.button("🔄 Actualizar Datos del Excel"):
+if st.button("🔄 Actualizar Datos"):
     st.cache_data.clear()
     st.rerun()
