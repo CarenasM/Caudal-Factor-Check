@@ -5,7 +5,6 @@ import os
 # --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
-# 1. Configuración de página: layout ancho y sidebar colapsado por defecto
 st.set_page_config(
     page_title="Caudales & Factor Check", 
     layout="wide", 
@@ -15,31 +14,34 @@ st.set_page_config(
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* 2. ELIMINACIÓN TOTAL DEL SIDEBAR */
+    /* Ocultar Sidebar */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
         display: none;
     }
     
-    /* Ajuste del margen superior para que no quede hueco */
+    /* Margen superior para evitar recortes */
     .block-container {
-        padding-top: 2rem;
+        padding-top: 3.5rem !important; 
     }
 
+    /* TÍTULO PRINCIPAL: GRANDE Y DOMINANTE */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 34px;
+        font-size: 42px; /* Tamaño aumentado */
         font-weight: bold;
         text-align: center;
-        margin-bottom: 2px;
+        margin-bottom: 5px;
     }
     
+    /* FIRMA: MÁS PEQUEÑA Y DISCRETA */
     .header-info {
         font-family: sans-serif;
         color: #666;
-        font-size: 14px;
+        font-size: 16px; /* Tamaño reducido respecto al título */
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 35px;
+        font-style: italic;
     }
 
     .w-label { 
@@ -55,58 +57,53 @@ st.markdown("""
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         gap: 15px;
     }
     .w-caudal {
         background-color: #E8F5E9; color: #2E7D32;
-        font-size: 20px; font-weight: bold; text-align: center;
-        padding: 5px 20px; border-radius: 10px; border: 2px solid #4CAF50;
+        font-size: 22px; font-weight: bold; text-align: center;
+        padding: 5px 25px; border-radius: 10px; border: 2px solid #4CAF50;
     }
     
     .factor-block {
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-width: 180px;
+        max-width: 190px;
         margin: 0 auto;
     }
 
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
-        padding: 6px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
+        padding: 8px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
         width: 100%;
-        box-sizing: border-box;
     }
 
     .stImage > img {
-        border-radius: 0;
         border-left: 1px solid #2196F3;
         border-right: 1px solid #2196F3;
-        max-width: 180px !important;
+        max-width: 190px !important;
         display: block;
-        margin: 0;
     }
 
     .w-factor-footer {
         background-color: #F5F5F5; color: #1565C0;
-        font-size: 22px; font-weight: bold; text-align: center;
-        padding: 5px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
+        font-size: 24px; font-weight: bold; text-align: center;
+        padding: 8px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
         width: 100%;
-        box-sizing: border-box;
     }
 
     .w-xtras-container {
-        border: 1px solid #2196F3; padding: 12px; border-radius: 10px;
-        background-color: #F1F8E9; margin-top: 20px;
-        max-width: 450px; margin-left: auto; margin-right: auto;
+        border: 1px solid #2196F3; padding: 15px; border-radius: 10px;
+        background-color: #F1F8E9; margin-top: 30px;
+        max-width: 500px; margin-left: auto; margin-right: auto;
     }
 
     div.stButton > button[kind="primary"] {
         background-color: #1E88E5 !important;
         color: white !important;
-        border: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -122,9 +119,7 @@ def cargar_datos():
     except: return None
 
 df = cargar_datos()
-if df is None:
-    st.error("No se pudo cargar el archivo de datos.")
-    st.stop()
+if df is None: st.stop()
 
 # --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
@@ -141,7 +136,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- SELECCIÓN Y RESULTADOS ---
+# --- SELECTORES Y RESULTADOS ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -181,8 +176,6 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 12px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
-        else:
-            st.info("Complete los selectores de la izquierda para ver la información técnica.")
+            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 15px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 13px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
 else:
-    st.info("Seleccione una Serie en la parte superior.")
+    st.info("Seleccione una Serie para comenzar.")
