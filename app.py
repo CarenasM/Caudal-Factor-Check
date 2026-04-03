@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE PÁGINA ---
+# --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
 st.set_page_config(
@@ -11,42 +11,39 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS PERSONALIZADOS ---
+# --- ESTILOS CSS REVISADOS ---
 st.markdown("""
     <style>
-    /* ELIMINAR SIDEBAR */
+    /* ELIMINAR SIDEBAR Y AJUSTAR ESPACIO SUPERIOR */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
         display: none;
     }
     
     .block-container {
-        padding-top: 2rem !important; 
+        padding-top: 4rem !important; /* Espacio extra para que el título no se corte */
     }
 
-    /* TÍTULO: DUPLICADO (110px) */
+    /* TÍTULO GRANDE (DOBLE) Y CENTRADO */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 110px; 
-        font-weight: 900;
+        font-size: 50px; /* Tamaño aumentado (doble) */
+        font-weight: bold;
         text-align: center;
-        margin-bottom: -10px;
-        line-height: 1.0;
-        letter-spacing: -2px;
+        margin-bottom: 5px;
+        line-height: 1.2;
     }
     
-    /* FIRMA: A LA MITAD (8px) */
+    /* FIRMA PEQUEÑA (MITAD) Y CENTRADA */
     .header-info {
         font-family: sans-serif;
-        color: #888;
-        font-size: 8px; 
+        color: #666;
+        font-size: 14px; /* Tamaño reducido (mitad) */
         text-align: center;
-        margin-bottom: 50px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        margin-bottom: 40px;
     }
 
-    /* ESTILOS DE INTERFAZ */
+    /* ESTILOS DE COMPONENTES (SE MANTIENEN) */
     .w-label { 
         font-family: sans-serif; 
         font-size: 14px; 
@@ -63,57 +60,60 @@ st.markdown("""
         margin-bottom: 25px;
         gap: 15px;
     }
-    
     .w-caudal {
         background-color: #E8F5E9; color: #2E7D32;
-        font-size: 24px; font-weight: bold; text-align: center;
-        padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50;
+        font-size: 20px; font-weight: bold; text-align: center;
+        padding: 5px 20px; border-radius: 10px; border: 2px solid #4CAF50;
     }
     
     .factor-block {
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-width: 200px;
+        max-width: 190px;
         margin: 0 auto;
     }
 
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
-        font-size: 15px; font-weight: bold; text-align: center;
-        padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
+        font-size: 14px; font-weight: bold; text-align: center;
+        padding: 8px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .stImage > img {
+        border-radius: 0;
         border-left: 1px solid #2196F3;
         border-right: 1px solid #2196F3;
-        max-width: 200px !important;
+        max-width: 190px !important;
         display: block;
+        margin: 0;
     }
 
     .w-factor-footer {
         background-color: #F5F5F5; color: #1565C0;
-        font-size: 26px; font-weight: bold; text-align: center;
-        padding: 10px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
+        font-size: 22px; font-weight: bold; text-align: center;
+        padding: 8px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .w-xtras-container {
-        border: 1px solid #2196F3; padding: 20px; border-radius: 12px;
-        background-color: #F1F8E9; margin-top: 35px;
-        max-width: 550px; margin-left: auto; margin-right: auto;
+        border: 1px solid #2196F3; padding: 15px; border-radius: 10px;
+        background-color: #F1F8E9; margin-top: 30px;
+        max-width: 500px; margin-left: auto; margin-right: auto;
     }
 
     div.stButton > button[kind="primary"] {
         background-color: #1E88E5 !important;
         color: white !important;
-        font-weight: bold;
+        border: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- LÓGICA DE DATOS ---
+# --- CARGA DE DATOS ---
 @st.cache_data
 def cargar_datos():
     if not os.path.exists(EXCEL_FILE): return None
@@ -126,14 +126,14 @@ def cargar_datos():
 
 df = cargar_datos()
 if df is None:
-    st.error("Error: Archivo 'datos_caudales.xlsx' no encontrado.")
+    st.error("Error: No se encontró el archivo Excel.")
     st.stop()
 
-# --- CABECERA ---
+# --- CABECERA (Ahora en el centro) ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
-st.markdown('<p class="header-info">Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
+st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
 
-# --- SELECTOR DE SERIE ---
+# --- 1. BOTONES DE SERIE ---
 series = sorted(df['serie'].unique())
 if "serie_sel" not in st.session_state: st.session_state.serie_sel = None
 
@@ -144,7 +144,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- CONTENIDO ---
+# --- 2. SELECTORES Y RESULTADOS ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -167,9 +167,12 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f[df_f['año'] == sel_ano].iloc[0]
             
+            # Bloque Caudal
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
+            # Fotos y Factores
             f_cols = st.columns(2)
+            
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Bypass</div>', unsafe_allow_html=True)
@@ -184,6 +187,7 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
-else:
-    st.info("Seleccione una Serie para cargar los factores técnicos.")
+            # Bloque Xtras
+            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 12px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
+        else:
+            st.info("Seleccione los parámetros a la izquierda.")
