@@ -11,17 +11,17 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS PARA ALINEACIÓN TOTAL ---
+# --- ESTILOS CSS CORREGIDOS ---
 st.markdown("""
     <style>
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] { display: none; }
     .block-container { padding-top: 2rem !important; }
 
-    /* TÍTULO MÁS GRANDE Y FIRMA MÁS PEQUEÑA */
+    /* TÍTULO Y FIRMA */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 80px; 
+        font-size: 70px; 
         font-weight: 900;
         text-align: center;
         margin-bottom: 0px;
@@ -29,55 +29,51 @@ st.markdown("""
     .header-info {
         font-family: sans-serif;
         color: #888;
-        font-size: 10px; 
+        font-size: 9px; 
         text-align: center;
         margin-bottom: 40px;
         text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
-    /* CONTENEDOR DE FACTOR CON ANCHO FIJO PARA ALINEAR */
-    .factor-wrapper {
+    /* ALINEACIÓN DE BLOQUES DE FACTOR */
+    .factor-container {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-
-    .factor-box {
-        width: 100%;
-        max-width: 400px; /* Controla el ancho máximo de todo el bloque */
+        height: 100%;
     }
 
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 16px; font-weight: bold; text-align: center;
         padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
-        margin-bottom: 0px;
     }
 
-    /* Imagen sin bordes extra para no desalinear */
     .stImage > img {
         border-left: 1px solid #2196F3;
         border-right: 1px solid #2196F3;
         width: 100% !important;
-        display: block;
     }
 
     .w-factor-footer {
         background-color: #F5F5F5; color: #1565C0;
-        font-size: 28px; font-weight: bold; text-align: center;
+        font-size: 26px; font-weight: bold; text-align: center;
         padding: 12px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
-        margin-top: 0px;
     }
 
-    /* OTROS */
-    .w-label { font-family: sans-serif; font-size: 14px; font-weight: bold; color: #444; }
-    .caudal-container { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; gap: 15px; }
-    .w-caudal { background-color: #E8F5E9; color: #2E7D32; font-size: 24px; font-weight: bold; padding: 5px 25px; border-radius: 10px; border: 2px solid #4CAF50; }
+    /* REPARACIÓN DE COLORES DE SELECTORES (QUITAR ROJO) */
+    .stSelectbox div[data-baseweb="select"] {
+        border-color: #d3d3d3 !important;
+    }
+
+    .w-label { font-family: sans-serif; font-size: 14px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
+    .caudal-container { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 15px; }
+    .w-caudal { background-color: #E8F5E9; color: #2E7D32; font-size: 24px; font-weight: bold; padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50; }
+    .w-xtras-container { border: 1px solid #2196F3; padding: 20px; border-radius: 12px; background-color: #F1F8E9; margin-top: 35px; max-width: 600px; margin-left: auto; margin-right: auto; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CARGA DE DATOS ---
+# --- LÓGICA DE DATOS ---
 @st.cache_data
 def cargar_datos():
     if not os.path.exists(EXCEL_FILE): return None
@@ -130,20 +126,14 @@ if df is not None:
                 f_cols = st.columns(2)
                 for idx, tipo_f in enumerate(["bypass", "lower"]):
                     with f_cols[idx]:
-                        st.markdown(f'''
-                            <div class="factor-wrapper">
-                                <div class="factor-box">
-                                    <div class="w-factor-header">{tipo_f.capitalize()}</div>
-                        ''', unsafe_allow_html=True)
+                        st.markdown(f'<div class="factor-container"><div class="w-factor-header">{tipo_f.capitalize()}</div>', unsafe_allow_html=True)
                         if os.path.exists(f"fotos/{tipo_f}.jpg"):
                             st.image(f"fotos/{tipo_f}.jpg", use_container_width=True)
-                        st.markdown(f'''
-                                    <div class="w-factor-footer">{res[f"factor-{tipo_f}"]}</div>
-                                </div>
-                            </div>
-                        ''', unsafe_allow_html=True)
+                        st.markdown(f'<div class="w-factor-footer">{res[f"factor-{tipo_f}"]}</div></div>', unsafe_allow_html=True)
+                
+                st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; text-align: center;">Notas Adicionales (Xtras)</div><div style="text-align: center;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
 
-# --- BOTÓN DE ACTUALIZAR (Al final) ---
+# --- RECARGA ---
 st.write("---")
 if st.button("🔄 Actualizar Datos del Excel"):
     st.cache_data.clear()
