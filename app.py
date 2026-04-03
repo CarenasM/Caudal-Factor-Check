@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN DE PÁGINA ---
+# --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
 st.set_page_config(
@@ -11,42 +11,34 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS PERSONALIZADOS ---
+# --- ESTILOS CSS CORREGIDOS ---
 st.markdown("""
     <style>
-    /* ELIMINAR SIDEBAR */
-    [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
-        display: none;
-    }
+    [data-testid="stSidebar"], [data-testid="stSidebarNav"] { display: none; }
     
-    .block-container {
-        padding-top: 2rem !important; 
-    }
+    .block-container { padding-top: 3rem !important; }
 
-    /* TÍTULO: GIGANTE (110px) */
+    /* TÍTULO: Grande y Legible */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 110px; 
+        font-size: 60px; 
         font-weight: 900;
         text-align: center;
-        margin-bottom: -10px;
-        line-height: 1.0;
-        letter-spacing: -2px;
+        margin-bottom: 10px;
+        line-height: 1.2;
     }
     
-    /* FIRMA: MINÚSCULA (8px) */
+    /* FIRMA: Pequeña y centrada */
     .header-info {
         font-family: sans-serif;
-        color: #888;
-        font-size: 8px; 
+        color: #666;
+        font-size: 12px; 
         text-align: center;
-        margin-bottom: 50px;
-        text-transform: uppercase;
+        margin-bottom: 40px;
         letter-spacing: 1px;
     }
 
-    /* ESTILOS DE INTERFAZ */
     .w-label { font-family: sans-serif; font-size: 14px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
     .caudal-container { display: flex; justify-content: center; align-items: center; margin-bottom: 25px; gap: 15px; }
     .w-caudal { background-color: #E8F5E9; color: #2E7D32; font-size: 24px; font-weight: bold; text-align: center; padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50; }
@@ -59,33 +51,28 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- LÓGICA DE CARGA CON RECARGA FORZADA ---
+# --- LÓGICA DE CARGA ---
+@st.cache_data
 def cargar_datos():
     if not os.path.exists(EXCEL_FILE): return None
     try:
-        # Leemos el excel sin caché si es necesario
         df = pd.read_excel(EXCEL_FILE)
         df.columns = [str(c).strip().lower() for c in df.columns]
-        # Convertimos vacíos en "N/A" para que se vean en la app
         df = df.fillna("N/A").astype(str)
         return df
     except: return None
 
-# Inicializar o recargar datos
-if "datos_app" not in st.session_state or st.sidebar.button("🔄 Actualizar Excel"):
-    st.session_state.datos_app = cargar_datos()
-
-df = st.session_state.datos_app
+df = cargar_datos()
 
 if df is None:
-    st.error("Error: Archivo 'datos_caudales.xlsx' no detectado.")
+    st.error("Error: No se encontró 'datos_caudales.xlsx'")
     st.stop()
 
 # --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
-st.markdown('<p class="header-info">Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
+st.markdown('<p class="header-info">SOPORTE TÉCNICO SAT | BY C@RENASM</p>', unsafe_allow_html=True)
 
-# --- SELECTOR DE SERIE ---
+# --- BOTONES DE SERIE ---
 series = sorted(df['serie'].unique())
 if "serie_sel" not in st.session_state: st.session_state.serie_sel = None
 
@@ -138,9 +125,10 @@ if st.session_state.serie_sel:
             
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
 else:
-    st.info("Seleccione una Serie para cargar los factores actualizados.")
+    st.info("Seleccione una Serie para comenzar.")
 
-# Botón pequeño al final para forzar recarga si los datos no aparecen
-if st.button("🔄 Forzar lectura de Excel", type="secondary"):
+# RECARGA AL FINAL
+st.write("---")
+if st.button("🔄 Actualizar Datos del Excel"):
     st.cache_data.clear()
     st.rerun()
