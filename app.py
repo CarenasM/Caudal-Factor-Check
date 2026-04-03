@@ -146,4 +146,62 @@ if st.session_state.serie_sel:
                 df_f = df_f[df_f['modelo'] == sel_mod]
                 
                 # Filtro Año
-                st.markdown
+                st.markdown('<p class="w-label">Año</p>', unsafe_allow_html=True)
+                ano_opts = ["- Seleccionar -"] + df_f['año'].unique().tolist()
+                sel_ano = st.selectbox("ano", ano_opts, label_visibility="collapsed")
+                
+                if sel_ano != "- Seleccionar -":
+                    df_f = df_f[df_f['año'] == sel_ano]
+
+    with col_der:
+        # Solo mostrar resultados si todos los filtros tienen valor real
+        if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
+            res = df_f.iloc[0]
+            
+            # --- FILA DE CABECERA (Caudal) ---
+            st.markdown(f"""
+                <div class="caudal-container">
+                    <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
+                    <div class="w-caudal">{res['consigna']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+            # --- FOTOS Y FACTORES (Reducción de tamaño de imágenes) ---
+            # Usamos 4 columnas para reducir las fotos a la mitad (1/4 de la pantalla cada una)
+            f_cols = st.columns(4) 
+            
+            with f_cols[0]: # COLUMNA BYPASS (Foto)
+                if os.path.exists("fotos/bypass.jpg"):
+                    st.image("fotos/bypass.jpg", use_container_width=True)
+                else:
+                    st.warning("⚠️ No se encuentra 'fotos/bypass.jpg'")
+                    
+            with f_cols[1]: # COLUMNA LOWER (Foto)
+                if os.path.exists("fotos/lower.jpg"):
+                    st.image("fotos/lower.jpg", use_container_width=True)
+                else:
+                    st.warning("⚠️ No se encuentra 'fotos/lower.jpg'")
+
+            # --- FILA DE FACTORES ---
+            st.markdown('<div class="w-factor-row">', unsafe_allow_html=True)
+            f_cols_val = st.columns(2)
+            with f_cols_val[0]:
+                st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
+                    
+            with f_cols_val[1]:
+                st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # --- XTRAS ---
+            st.markdown(f"""
+                <div class="w-xtras-container">
+                    <div class="w-xtras-title">Xtras</div>
+                    <div class="w-xtras-text">{res['xtras']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            # Espacio en blanco o mensaje guía si falta algún filtro
+            if st.session_state.serie_sel:
+                st.info("Complete la selección para ver los resultados.")
+else:
+    st.info("Por favor, seleccione una Serie para comenzar.")
