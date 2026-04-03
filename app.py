@@ -7,30 +7,26 @@ EXCEL_FILE = "datos_caudales.xlsx"
 
 st.set_page_config(page_title="Configurador Waldner SAT", layout="wide")
 
-# --- ESTILOS CSS (Celeste y corrección de solapamiento) ---
+# --- ESTILOS CSS (Limpieza y Celeste) ---
 st.markdown("""
     <style>
-    /* Estilo general y etiquetas con más margen inferior para no solapar */
     .w-label { 
         font-family: sans-serif; 
         font-size: 16px; 
         font-style: italic; 
         font-weight: bold;
-        margin-bottom: 5px; /* Aumentado para dar espacio */
+        margin-bottom: 5px;
         display: block;
     }
     
-    /* Ajuste para que los selectores no monten sobre el título */
     .stSelectbox { margin-bottom: 15px; }
 
-    /* Cuadro de Caudal compacto */
     .w-caudal {
         background-color: #90EE90; color: #1b5e20;
         font-size: 22px; font-weight: bold; text-align: center;
         padding: 5px 15px; border-radius: 8px; border: 2px solid #2e7d32;
     }
     
-    /* Cuadros de Factores */
     .w-factor {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
@@ -38,7 +34,6 @@ st.markdown("""
     }
     .w-factor-val { font-size: 20px; display: block; margin-top: 2px; }
     
-    /* Cuadro de Xtras */
     .w-xtras-container {
         border: 1px solid #333; padding: 10px; border-radius: 5px;
         background-color: #fff; margin-top: 10px;
@@ -48,7 +43,7 @@ st.markdown("""
 
     /* Botón Celeste al seleccionar */
     div.stButton > button[kind="primary"] {
-        background-color: #00BFFF !important; /* Celeste / DeepSkyBlue */
+        background-color: #00BFFF !important; 
         color: white !important;
         border: 1px solid #00BFFF !important;
     }
@@ -84,29 +79,27 @@ if "serie_sel" not in st.session_state:
 
 cols_s = st.columns(len(series_disponibles))
 for i, s in enumerate(series_disponibles):
-    # Celeste si es el activo
     es_activo = "primary" if st.session_state.serie_sel == s else "secondary"
     if cols_s[i].button(s, key=f"btn_{s}", use_container_width=True, type=es_activo):
         st.session_state.serie_sel = s
         st.rerun()
 
-# Si no hay serie elegida, no mostramos el resto para que empiece "vacío"
+# --- 2. FLUJO DE SELECCIÓN ---
 if st.session_state.serie_sel:
     col_izq, col_der = st.columns([1, 2])
 
     with col_izq:
         df_f = df[df['serie'] == st.session_state.serie_sel]
         
-        # Filtro Dimensión con opción vacía al inicio
-        st.markdown('<p class="w-label">Dimensión</p>', unsafe_allow_html=True)
+        # Dimensión (Ya no tiene el "mm" debajo)
+        st.markdown('<p class="w-label">Dimensión (mm)</p>', unsafe_allow_html=True)
         dim_opts = ["- Seleccionar -"] + sorted(df_f['dimension'].unique().tolist(), key=lambda x: int(x) if str(x).isdigit() else 0)
         sel_dim = st.selectbox("dim", dim_opts, label_visibility="collapsed")
         
         if sel_dim != "- Seleccionar -":
-            st.caption("mm")
             df_f = df_f[df_f['dimension'] == sel_dim]
             
-            # Filtro Modelo
+            # Modelo
             st.markdown('<p class="w-label">Modelo</p>', unsafe_allow_html=True)
             mod_opts = ["- Seleccionar -"] + sorted(df_f['modelo'].unique().tolist())
             sel_mod = st.selectbox("mod", mod_opts, label_visibility="collapsed")
@@ -114,7 +107,7 @@ if st.session_state.serie_sel:
             if sel_mod != "- Seleccionar -":
                 df_f = df_f[df_f['modelo'] == sel_mod]
                 
-                # Filtro Año
+                # Año (Compatible con "Desde 2010")
                 st.markdown('<p class="w-label">Año</p>', unsafe_allow_html=True)
                 ano_opts = ["- Seleccionar -"] + df_f['año'].unique().tolist()
                 sel_ano = st.selectbox("ano", ano_opts, label_visibility="collapsed")
@@ -123,10 +116,10 @@ if st.session_state.serie_sel:
                     df_f = df_f[df_f['año'] == sel_ano]
 
     with col_der:
-        # Solo mostrar resultados si todos los filtros tienen valor real
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f.iloc[0]
             
+            # Resultados visuales
             st.markdown(f"""
                 <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom:10px;">
                     <span style="margin-right: 10px; font-weight: bold; font-size: 15px;">Caudal Consigna (m³/h)</span>
@@ -152,7 +145,6 @@ if st.session_state.serie_sel:
                 </div>
             """, unsafe_allow_html=True)
         else:
-            # Espacio en blanco o mensaje guía si falta algún filtro
             if st.session_state.serie_sel:
                 st.info("Complete la selección para ver los resultados.")
 else:
