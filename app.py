@@ -14,34 +14,36 @@ st.set_page_config(
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* Ocultar Sidebar */
+    /* Ocultar Sidebar por completo */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
         display: none;
     }
     
-    /* Margen superior para evitar recortes en el título */
+    /* Espaciado superior para centrar el contenido */
     .block-container {
-        padding-top: 3.5rem !important; 
+        padding-top: 4rem !important; 
     }
 
-    /* TÍTULO PRINCIPAL: GRANDE */
+    /* TÍTULO PRINCIPAL: MÁXIMO PROTAGONISMO */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 46px; /* Tamaño aumentado considerablemente */
-        font-weight: bold;
+        font-size: 52px; /* Tamaño extra grande */
+        font-weight: 900; /* Más grosor */
         text-align: center;
-        margin-bottom: 2px;
+        margin-bottom: 0px;
+        line-height: 1.1;
     }
     
-    /* FIRMA Y SOPORTE: MÁS PEQUEÑOS QUE EL TÍTULO */
+    /* FIRMA: SUBTÍTULO ELEGANTE */
     .header-info {
         font-family: sans-serif;
-        color: #666;
-        font-size: 18px; /* Tamaño moderado para que sea secundario */
+        color: #555;
+        font-size: 18px; /* Considerablemente más pequeño que el título */
         text-align: center;
-        margin-bottom: 35px;
+        margin-bottom: 40px;
         font-style: italic;
+        opacity: 0.9;
     }
 
     .w-label { 
@@ -60,50 +62,52 @@ st.markdown("""
         margin-bottom: 25px;
         gap: 15px;
     }
+    
     .w-caudal {
         background-color: #E8F5E9; color: #2E7D32;
-        font-size: 22px; font-weight: bold; text-align: center;
-        padding: 5px 25px; border-radius: 10px; border: 2px solid #4CAF50;
+        font-size: 24px; font-weight: bold; text-align: center;
+        padding: 5px 30px; border-radius: 12px; border: 2px solid #4CAF50;
     }
     
     .factor-block {
         display: flex;
         flex-direction: column;
         align-items: center;
-        max-width: 190px;
+        max-width: 200px;
         margin: 0 auto;
     }
 
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
-        font-size: 14px; font-weight: bold; text-align: center;
-        padding: 8px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
+        font-size: 15px; font-weight: bold; text-align: center;
+        padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
         width: 100%;
     }
 
     .stImage > img {
         border-left: 1px solid #2196F3;
         border-right: 1px solid #2196F3;
-        max-width: 190px !important;
+        max-width: 200px !important;
         display: block;
     }
 
     .w-factor-footer {
         background-color: #F5F5F5; color: #1565C0;
-        font-size: 24px; font-weight: bold; text-align: center;
-        padding: 8px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
+        font-size: 26px; font-weight: bold; text-align: center;
+        padding: 10px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
         width: 100%;
     }
 
     .w-xtras-container {
-        border: 1px solid #2196F3; padding: 15px; border-radius: 10px;
-        background-color: #F1F8E9; margin-top: 30px;
-        max-width: 500px; margin-left: auto; margin-right: auto;
+        border: 1px solid #2196F3; padding: 20px; border-radius: 12px;
+        background-color: #F1F8E9; margin-top: 35px;
+        max-width: 550px; margin-left: auto; margin-right: auto;
     }
 
     div.stButton > button[kind="primary"] {
         background-color: #1E88E5 !important;
         color: white !important;
+        font-weight: bold;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -159,8 +163,10 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f[df_f['año'] == sel_ano].iloc[0]
             
+            # Caudal
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
+            # Factores
             f_cols = st.columns(2)
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
@@ -176,6 +182,7 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 15px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 13px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
+            # Notas
+            st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
 else:
-    st.info("Seleccione una Serie para comenzar.")
+    st.info("Seleccione una Serie para continuar.")
