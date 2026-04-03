@@ -10,24 +10,23 @@ st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* TÍTULO MÁS GRANDE Y CENTRADO */
+    /* TÍTULO PRINCIPAL */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 34px; /* Tamaño aumentado */
+        font-size: 34px;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 0px;
+        margin-bottom: 2px;
     }
     
-    /* FIRMA CENTRADA DEBAJO DEL TÍTULO */
-    .author-signature {
+    /* SOPORTE Y FIRMA EN LA MISMA LÍNEA */
+    .header-info {
         font-family: sans-serif;
         color: #666;
         font-size: 14px;
         text-align: center;
         margin-bottom: 20px;
-        font-style: italic;
     }
 
     .w-label { 
@@ -112,12 +111,12 @@ def cargar_datos():
 df = cargar_datos()
 if df is None: st.stop()
 
-# CABECERA: TÍTULO Y FIRMA
+# CABECERA UNIFICADA
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
-st.markdown('<p class="author-signature">By C@renasM</p>', unsafe_allow_html=True)
+st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
 
-# Sidebar (Limpio)
-st.sidebar.write("🛠️ **Soporte SAT**")
+# Sidebar (Ahora más despejado)
+st.sidebar.caption("Panel de Control SAT")
 
 # --- BOTONES DE SERIE ---
 series = sorted(df['serie'].unique())
