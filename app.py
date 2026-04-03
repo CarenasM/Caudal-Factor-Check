@@ -1,5 +1,5 @@
 import streamlit as st
-import pd
+import pandas as pd
 import os
 
 # --- CONFIGURACIÓN ---
@@ -49,6 +49,7 @@ st.markdown("""
         border: 1px solid #CFD8DC;
         max-width: 170px !important;
         margin: 0 auto;
+        display: block;
     }
 
     /* Cuadros de Factores en Azul */
@@ -93,7 +94,9 @@ def cargar_datos():
     except: return None
 
 df = cargar_datos()
-if df is None: st.stop()
+if df is None:
+    st.error("No se encontró el archivo Excel.")
+    st.stop()
 
 # Sidebar
 st.sidebar.write("🛠️ **Soporte SAT**")
@@ -135,33 +138,38 @@ if st.session_state.serie_sel:
 
     with col_der:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
-            res = df_f[df_f['año'] == sel_ano].iloc[0]
-            
-            # Bloque Caudal
-            st.markdown(f"""
-                <div class="caudal-container">
-                    <span style="font-weight: bold; color: #555;">Caudal Consigna</span>
-                    <div class="w-caudal">{res['consigna']} m³/h</div>
-                </div>
-            """, unsafe_allow_html=True)
+            # Filtrar por el año seleccionado
+            res_df = df_f[df_f['año'] == sel_ano]
+            if not res_df.empty:
+                res = res_df.iloc[0]
+                
+                # Bloque Caudal
+                st.markdown(f"""
+                    <div class="caudal-container">
+                        <span style="font-weight: bold; color: #555;">Caudal Consigna</span>
+                        <div class="w-caudal">{res['consigna']} m³/h</div>
+                    </div>
+                """, unsafe_allow_html=True)
 
-            # Fotos y Factores en columnas limpias
-            f_cols = st.columns(2)
-            
-            with f_cols[0]:
-                if os.path.exists("fotos/bypass.jpg"): st.image("fotos/bypass.jpg")
-                st.markdown(f'<div class="w-factor">Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
-                    
-            with f_cols[1]:
-                if os.path.exists("fotos/lower.jpg"): st.image("fotos/lower.jpg")
-                st.markdown(f'<div class="w-factor">Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
-            
-            # Bloque Xtras (Ahora en azul)
-            st.markdown(f"""
-                <div class="w-xtras-container">
-                    <div class="w-xtras-title">Notas Adicionales (Xtras)</div>
-                    <div class="w-xtras-text">{res['xtras']}</div>
-                </div>
-            """, unsafe_allow_html=True)
+                # Fotos y Factores
+                f_cols = st.columns(2)
+                
+                with f_cols[0]:
+                    if os.path.exists("fotos/bypass.jpg"): 
+                        st.image("fotos/bypass.jpg")
+                    st.markdown(f'<div class="w-factor">Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
+                        
+                with f_cols[1]:
+                    if os.path.exists("fotos/lower.jpg"): 
+                        st.image("fotos/lower.jpg")
+                    st.markdown(f'<div class="w-factor">Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
+                
+                # Bloque Xtras
+                st.markdown(f"""
+                    <div class="w-xtras-container">
+                        <div class="w-xtras-title">Notas Adicionales (Xtras)</div>
+                        <div class="w-xtras-text">{res['xtras']}</div>
+                    </div>
+                """, unsafe_allow_html=True)
         else:
             st.info("Seleccione los parámetros para mostrar los resultados.")
