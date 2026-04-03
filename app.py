@@ -124,3 +124,36 @@ if st.session_state.serie_sel:
 
     with col_der:
         # Solo mostrar resultados si todos los filtros tienen valor real
+        if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
+            res = df_f.iloc[0]
+            
+            st.markdown(f"""
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom:10px;">
+                    <span style="margin-right: 10px; font-weight: bold; font-size: 15px;">Caudal Consigna (m³/h)</span>
+                    <div class="w-caudal">{res['consigna']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            f_cols = st.columns(2)
+            with f_cols[0]:
+                st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
+                if os.path.exists("fotos/guia_bypass.jpg"): st.image("fotos/guia_bypass.jpg")
+                else: st.caption("📸 Foto Bypass")
+                    
+            with f_cols[1]:
+                st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
+                if os.path.exists("fotos/guia_lower.jpg"): st.image("fotos/guia_lower.jpg")
+                else: st.caption("📸 Foto Lower")
+            
+            st.markdown(f"""
+                <div class="w-xtras-container">
+                    <div class="w-xtras-title">Xtras</div>
+                    <div class="w-xtras-text">{res['xtras']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            # Espacio en blanco o mensaje guía si falta algún filtro
+            if st.session_state.serie_sel:
+                st.info("Complete la selección para ver los resultados.")
+else:
+    st.info("Por favor, seleccione una Serie para comenzar.")
