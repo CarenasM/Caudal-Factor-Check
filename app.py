@@ -5,11 +5,21 @@ import os
 # --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
-st.set_page_config(page_title="Configurador Waldner SAT", layout="wide")
+st.set_page_config(page_title="Caudales & Factor Check", layout="wide")
 
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
+    /* Título Principal */
+    .main-title {
+        font-family: sans-serif;
+        color: #0D47A1;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+    
     .w-label { 
         font-family: sans-serif; 
         font-size: 16px; 
@@ -21,7 +31,7 @@ st.markdown("""
     .stSelectbox { margin-bottom: 15px; }
     
     .caudal-container {
-        height: 60px; /* Aumentado ligeramente */
+        height: 60px;
         display: flex;
         align-items: center;
     }
@@ -33,7 +43,6 @@ st.markdown("""
         display: inline-block;
     }
     
-    /* Añadido margen superior para separar de la fila del caudal */
     .w-factor-row {
         margin-top: 25px; 
     }
@@ -83,6 +92,8 @@ st.sidebar.markdown("---")
 st.sidebar.write("🛠️ **Soporte Técnico SAT**")
 st.sidebar.markdown("By **C@renasM**")
 
+# --- CABECERA ---
+st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.write("Seleccione parámetros para acceder a la información")
 
 # --- 1. BOTONES DE SERIE ---
@@ -123,37 +134,4 @@ if st.session_state.serie_sel:
 
     with col_der:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
-            res = df_f.iloc[0]
-            
-            # --- FILA DE CABECERA (Caudal) ---
-            st.markdown(f"""
-                <div class="caudal-container">
-                    <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
-                    <div class="w-caudal">{res['consigna']}</div>
-                </div>
-            """, unsafe_allow_html=True)
-
-            # --- FILA DE FACTORES (Bajados con margen superior) ---
-            st.markdown('<div class="w-factor-row">', unsafe_allow_html=True)
-            f_cols = st.columns(2)
-            with f_cols[0]:
-                st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/guia_bypass.jpg"): st.image("fotos/guia_bypass.jpg")
-                else: st.caption("📸 Foto Bypass")
-                    
-            with f_cols[1]:
-                st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
-                if os.path.exists("fotos/guia_lower.jpg"): st.image("fotos/guia_lower.jpg")
-                else: st.caption("📸 Foto Lower")
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            st.markdown(f"""
-                <div class="w-xtras-container">
-                    <div class="w-xtras-title">Xtras</div>
-                    <div class="w-xtras-text">{res['xtras']}</div>
-                </div>
-            """, unsafe_allow_html=True)
-        else:
-            if st.session_state.serie_sel: st.info("Complete la selección para ver los resultados.")
-else:
-    st.info("Por favor, seleccione una Serie para comenzar.")
+            res = df_f.iloc
