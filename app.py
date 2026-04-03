@@ -19,18 +19,29 @@ st.markdown("""
         display: block;
     }
     .stSelectbox { margin-bottom: 15px; }
+    
+    /* Contenedor para el caudal para que no empuje el factor hacia abajo */
+    .caudal-container {
+        height: 50px;
+        display: flex;
+        align-items: center;
+    }
+    
     .w-caudal {
         background-color: #90EE90; color: #1b5e20;
         font-size: 22px; font-weight: bold; text-align: center;
         padding: 5px 15px; border-radius: 8px; border: 2px solid #2e7d32;
         display: inline-block;
     }
+    
     .w-factor {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
         padding: 8px; border-radius: 8px; border: 1px solid #2196F3;
+        min-height: 80px; /* Altura fija para asegurar alineación */
     }
     .w-factor-val { font-size: 20px; display: block; margin-top: 2px; }
+    
     .w-xtras-container {
         border: 1px solid #333; padding: 10px; border-radius: 5px;
         background-color: #fff; margin-top: 10px;
@@ -38,16 +49,6 @@ st.markdown("""
     .w-xtras-title { color: red; font-style: italic; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 2px; }
     .w-xtras-text { font-size: 13px; text-align: center; color: #333; }
     
-    /* Firma de autor en el sidebar */
-    .w-footer {
-        position: fixed;
-        left: 10px;
-        bottom: 10px;
-        color: #888;
-        font-size: 12px;
-        font-style: italic;
-    }
-
     div.stButton > button[kind="primary"] {
         background-color: #00BFFF !important; 
         color: white !important;
@@ -120,23 +121,27 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f.iloc[0]
             
-            # --- RESULTADOS ALINEADOS ---
-            f_cols = st.columns(2)
-            
-            with f_cols[0]: # LADO IZQUIERDO: Caudal y Factor Bypass
+            # --- FILA DE CABECERA (Caudal a la izquierda) ---
+            c1, c2 = st.columns(2)
+            with c1:
                 st.markdown(f"""
-                    <div style="display: flex; align-items: center; margin-bottom:10px;">
+                    <div class="caudal-container">
                         <span style="margin-right: 10px; font-weight: bold; font-size: 14px;">Caudal Consigna (m³/h)</span>
                         <div class="w-caudal">{res['consigna']}</div>
                     </div>
                 """, unsafe_allow_html=True)
-                
+            with c2:
+                # Espacio para mantener la simetría
+                st.markdown('<div class="caudal-container"></div>', unsafe_allow_html=True)
+
+            # --- FILA DE FACTORES (Alineados) ---
+            f_cols = st.columns(2)
+            with f_cols[0]:
                 st.markdown(f'<div class="w-factor">Factor-Bypass<br><span class="w-factor-val">{res["factor-bypass"]}</span></div>', unsafe_allow_html=True)
                 if os.path.exists("fotos/guia_bypass.jpg"): st.image("fotos/guia_bypass.jpg")
                 else: st.caption("📸 Foto Bypass")
                     
-            with f_cols[1]: # LADO DERECHO: Factor Lower
-                st.markdown('<div style="height: 45px;"></div>', unsafe_allow_html=True)
+            with f_cols[1]:
                 st.markdown(f'<div class="w-factor">Factor-Lower<br><span class="w-factor-val">{res["factor-lower"]}</span></div>', unsafe_allow_html=True)
                 if os.path.exists("fotos/guia_lower.jpg"): st.image("fotos/guia_lower.jpg")
                 else: st.caption("📸 Foto Lower")
