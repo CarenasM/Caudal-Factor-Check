@@ -19,26 +19,26 @@ st.markdown("""
         display: none;
     }
     
-    /* Margen superior para evitar recortes */
+    /* Margen superior para evitar recortes en el título */
     .block-container {
         padding-top: 3.5rem !important; 
     }
 
-    /* TÍTULO PRINCIPAL: GRANDE Y DOMINANTE */
+    /* TÍTULO PRINCIPAL: GRANDE */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 42px; /* Tamaño aumentado */
+        font-size: 46px; /* Tamaño aumentado considerablemente */
         font-weight: bold;
         text-align: center;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
     }
     
-    /* FIRMA: MÁS PEQUEÑA Y DISCRETA */
+    /* FIRMA Y SOPORTE: MÁS PEQUEÑOS QUE EL TÍTULO */
     .header-info {
         font-family: sans-serif;
         color: #666;
-        font-size: 16px; /* Tamaño reducido respecto al título */
+        font-size: 18px; /* Tamaño moderado para que sea secundario */
         text-align: center;
         margin-bottom: 35px;
         font-style: italic;
