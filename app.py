@@ -5,16 +5,26 @@ import os
 # --- CONFIGURACIÓN ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
-# Configuración de página sin barra lateral por defecto
-st.set_page_config(page_title="Caudales & Factor Check", layout="wide", initial_sidebar_state="collapsed")
+# 1. Configuración de página: layout ancho y sidebar colapsado por defecto
+st.set_page_config(
+    page_title="Caudales & Factor Check", 
+    layout="wide", 
+    initial_sidebar_state="collapsed"
+)
 
 # --- ESTILOS CSS ---
 st.markdown("""
     <style>
-    /* Ocultar botón de sidebar y espacios innecesarios */
-    [data-testid="stSidebar"] {display: none;}
-    [data-testid="stSidebarNav"] {display: none;}
+    /* 2. ELIMINACIÓN TOTAL DEL SIDEBAR */
+    [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
+        display: none;
+    }
     
+    /* Ajuste del margen superior para que no quede hueco */
+    .block-container {
+        padding-top: 2rem;
+    }
+
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
@@ -113,10 +123,10 @@ def cargar_datos():
 
 df = cargar_datos()
 if df is None:
-    st.error("Archivo de datos no encontrado.")
+    st.error("No se pudo cargar el archivo de datos.")
     st.stop()
 
-# CABECERA (Sin Sidebar)
+# --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
 
@@ -131,7 +141,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- SELECTORES Y RESULTADOS ---
+# --- SELECCIÓN Y RESULTADOS ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -157,7 +167,6 @@ if st.session_state.serie_sel:
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
             f_cols = st.columns(2)
-            
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Bypass</div>', unsafe_allow_html=True)
@@ -174,6 +183,6 @@ if st.session_state.serie_sel:
             
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 12px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
         else:
-            st.info("Seleccione los parámetros para acceder a la información.")
+            st.info("Complete los selectores de la izquierda para ver la información técnica.")
 else:
-    st.info("Seleccione una Serie para comenzar.")
+    st.info("Seleccione una Serie en la parte superior.")
