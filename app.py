@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN DE PÁGINA ---
 EXCEL_FILE = "datos_caudales.xlsx"
 
 st.set_page_config(
@@ -11,41 +11,40 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- ESTILOS CSS ---
+# --- ESTILOS CSS PERSONALIZADOS ---
 st.markdown("""
     <style>
-    /* Ocultar Sidebar por completo */
+    /* 1. ELIMINAR SIDEBAR Y AJUSTAR MARGEN SUPERIOR */
     [data-testid="stSidebar"], [data-testid="stSidebarNav"] {
         display: none;
     }
     
-    /* Espaciado superior para centrar el contenido */
     .block-container {
-        padding-top: 4rem !important; 
+        padding-top: 3.5rem !important; 
     }
 
-    /* TÍTULO PRINCIPAL: MÁXIMO PROTAGONISMO */
+    /* 2. TÍTULOS: Título grande y Firma pequeña */
     .main-title {
         font-family: sans-serif;
         color: #1E88E5;
-        font-size: 52px; /* Tamaño extra grande */
-        font-weight: 900; /* Más grosor */
+        font-size: 52px; /* Tamaño máximo para el título */
+        font-weight: 900;
         text-align: center;
         margin-bottom: 0px;
         line-height: 1.1;
     }
     
-    /* FIRMA: SUBTÍTULO ELEGANTE */
     .header-info {
         font-family: sans-serif;
         color: #555;
-        font-size: 18px; /* Considerablemente más pequeño que el título */
+        font-size: 16px; /* Tamaño reducido para la firma */
         text-align: center;
         margin-bottom: 40px;
         font-style: italic;
-        opacity: 0.9;
+        opacity: 0.8;
     }
 
+    /* 3. ELEMENTOS DE LA INTERFAZ */
     .w-label { 
         font-family: sans-serif; 
         font-size: 14px; 
@@ -112,6 +111,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- LÓGICA DE DATOS ---
 @st.cache_data
 def cargar_datos():
     if not os.path.exists(EXCEL_FILE): return None
@@ -123,13 +123,15 @@ def cargar_datos():
     except: return None
 
 df = cargar_datos()
-if df is None: st.stop()
+if df is None:
+    st.error("Error: No se encontró el archivo 'datos_caudales.xlsx'")
+    st.stop()
 
 # --- CABECERA ---
 st.markdown('<p class="main-title">Caudales & Factor Check</p>', unsafe_allow_html=True)
 st.markdown('<p class="header-info">🛠️ Soporte Técnico SAT | By C@renasM</p>', unsafe_allow_html=True)
 
-# --- BOTONES DE SERIE ---
+# --- BOTONES DE SERIE (HORIZONTAL) ---
 series = sorted(df['serie'].unique())
 if "serie_sel" not in st.session_state: st.session_state.serie_sel = None
 
@@ -140,7 +142,7 @@ for i, s in enumerate(series):
         st.session_state.serie_sel = s
         st.rerun()
 
-# --- SELECTORES Y RESULTADOS ---
+# --- CUERPO DE LA APP ---
 if st.session_state.serie_sel:
     df_f = df[df['serie'] == st.session_state.serie_sel]
     col_izq, col_der = st.columns([1, 2.5])
@@ -163,10 +165,10 @@ if st.session_state.serie_sel:
         if 'sel_ano' in locals() and sel_ano != "- Seleccionar -" and not df_f.empty:
             res = df_f[df_f['año'] == sel_ano].iloc[0]
             
-            # Caudal
+            # Caudal Consigna
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
-            # Factores
+            # Bloques de Factores
             f_cols = st.columns(2)
             with f_cols[0]:
                 st.markdown('<div class="factor-block">', unsafe_allow_html=True)
@@ -182,7 +184,9 @@ if st.session_state.serie_sel:
                 st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            # Notas
+            # Notas Xtras
             st.markdown(f'<div class="w-xtras-container"><div style="color: #1E88E5; font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 5px;">Notas Adicionales (Xtras)</div><div style="font-size: 14px; text-align: center; color: #333;">{res["xtras"]}</div></div>', unsafe_allow_html=True)
+        else:
+            st.info("Utilice los menús de la izquierda para filtrar la información técnica.")
 else:
-    st.info("Seleccione una Serie para continuar.")
+    st.info("Seleccione una Serie en la barra superior para comenzar.")
