@@ -39,28 +39,41 @@ st.markdown("""
         padding: 5px 20px; border-radius: 10px; border: 2px solid #4CAF50;
     }
     
-    /* Letreros de Factores ENCIMA */
+    /* BLOQUE UNIFICADO DE FACTOR */
+    .factor-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 180px;
+        margin: 0 auto;
+    }
+
+    /* Etiqueta superior */
     .w-factor-header {
         background-color: #E3F2FD; color: #0D47A1;
         font-size: 14px; font-weight: bold; text-align: center;
         padding: 6px; border-radius: 8px 8px 0 0; border: 1px solid #2196F3;
-        max-width: 170px; margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    /* Imagen alineada con el letrero */
+    /* Imagen central */
     .stImage > img {
-        border-radius: 0 0 8px 8px;
-        border: 1px solid #2196F3;
-        border-top: none;
-        max-width: 170px !important;
-        margin: 0 auto;
+        border-radius: 0;
+        border-left: 1px solid #2196F3;
+        border-right: 1px solid #2196F3;
+        max-width: 180px !important;
         display: block;
+        margin: 0;
     }
 
-    /* Valor debajo de la imagen */
-    .w-factor-value {
-        font-size: 20px; font-weight: bold; color: #1565C0;
-        text-align: center; margin-top: 5px;
+    /* Valor inferior */
+    .w-factor-footer {
+        background-color: #F5F5F5; color: #1565C0;
+        font-size: 22px; font-weight: bold; text-align: center;
+        padding: 5px; border-radius: 0 0 8px 8px; border: 1px solid #2196F3;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .w-xtras-container {
@@ -134,18 +147,22 @@ if st.session_state.serie_sel:
             # Bloque Caudal
             st.markdown(f'<div class="caudal-container"><span style="font-weight: bold; color: #555;">Caudal Consigna</span><div class="w-caudal">{res["consigna"]} m³/h</div></div>', unsafe_allow_html=True)
 
-            # --- BLOQUES DE FACTORES (Letrero + Imagen + Valor) ---
+            # --- BLOQUES DE FACTORES REESTRUCTURADOS ---
             f_cols = st.columns(2)
             
             with f_cols[0]:
+                st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Bypass</div>', unsafe_allow_html=True)
                 if os.path.exists("fotos/bypass.jpg"): st.image("fotos/bypass.jpg")
-                st.markdown(f'<div class="w-factor-value">{res["factor-bypass"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="w-factor-footer">{res["factor-bypass"]}</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
                     
             with f_cols[1]:
+                st.markdown('<div class="factor-block">', unsafe_allow_html=True)
                 st.markdown('<div class="w-factor-header">Lower</div>', unsafe_allow_html=True)
                 if os.path.exists("fotos/lower.jpg"): st.image("fotos/lower.jpg")
-                st.markdown(f'<div class="w-factor-value">{res["factor-lower"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="w-factor-footer">{res["factor-lower"]}</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
             
             # Bloque Notas
             st.markdown(f'<div class="w-xtras-container"><div class="w-xtras-title">Notas Adicionales (Xtras)</div><div class="w-xtras-text">{res["xtras"]}</div></div>', unsafe_allow_html=True)
